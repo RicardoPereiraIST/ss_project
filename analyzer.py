@@ -11,17 +11,21 @@ def importFile(filename):
 
 			parsed_lines = []
 			temp_line = ""
+
 			for line in slice_lines:
-				if line[-1] != ';':
-					temp_line += line
-				elif temp_line != "":
-					parsed_lines.append(temp_line)
-					temp_line = ""
-				else:
+				if line[-1] == ';' and temp_line == "":
 					parsed_lines.append(line)
 
-			if temp_line != "":
+				elif line[-1] != ';':
+					temp_line += line
+
+				elif line[-1] == ';' and temp_line != "":
+					parsed_lines.append(temp_line + " " + line)
+					temp_line = ""
+
+			if(temp_line != ""):
 				parsed_lines.append(temp_line)
+
 
 			for line in parsed_lines:
 				if line[0] == '$':
@@ -40,6 +44,7 @@ def importFile(filename):
 		print ("Error opening file")
 		sys.exit(1)
 
+	print(result_list)
 	return result_list
 
 def importPatterns(filename):
@@ -68,10 +73,7 @@ def importPatterns(filename):
 	return structured_patterns
 
 def substituteVariables(variable_list):
-	for i in range(1, len(variable_list)):
-		variable_list[i][1] = variable_list[i][1].replace(variable_list[i-1][0], variable_list[i-1][1])
-
-	return variable_list[-1][1]
+	
 
 
 def checkArgs():
@@ -86,13 +88,14 @@ if __name__ == "__main__":
 
 	patterns = importPatterns("proj-patterns/patterns")
 
-	parsed_instruction = substituteVariables(variable_list)
-	print(parsed_instruction)
+	#parsed_instruction = substituteVariables(variable_list)
 
 	content = []
 	flag = False
 
-	for pattern in patterns:
+	#print(parsed_instruction)
+
+	"""for pattern in patterns:
 		sensitive_sinks = pattern[3].split(',')
 		for sink in sensitive_sinks:
 			if re.compile(sink + '\((.*?)\)').findall(parsed_instruction) != []:
@@ -116,4 +119,4 @@ if __name__ == "__main__":
 						print("Inseguro")
 						sys.exit(1)
 
-	print("Seguro") 
+	print("Seguro") """
