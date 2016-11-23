@@ -67,4 +67,32 @@ if __name__ == "__main__":
 
 	parsed_instruction = substituteVariables(variable_list)
 
-	print(parsed_instruction)
+	content = []
+	flag = False
+
+	for pattern in patterns:
+		sensitive_sinks = pattern[3].split(',')
+		for sink in sensitive_sinks:
+			if re.compile(sink + '\((.*?)\)').findall(parsed_instruction) != []:
+				content = re.compile(sink + '\((.*?)\)').findall(parsed_instruction)
+				content = content[0].split(',')
+
+		inner_inner_content = []
+		sanitization_functions = pattern[2].split(',')
+		for function in sanitization_functions:
+			for inner_content in content:
+				if re.compile(function + '\((.*?)\)').findall(inner_content) != []:
+					inner_inner_content = re.compile(sink + '\((.*?)\)').findall(inner_content)
+					flag = True
+					break
+
+		print(content)
+		if(flag != True):
+			entry_points = pattern[1].split(',')
+			for entry_point in entry_points:
+				for inner_content in content:
+					if re.compile(entry_point.replace('$','\$') + '\[(.*?)\]').findall(inner_content) != []:
+						print("Inseguro")
+						sys.exit(1)
+
+	print("Seguro")
