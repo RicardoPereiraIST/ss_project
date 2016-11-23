@@ -2,16 +2,37 @@ import sys
 import re
 
 def importFile(filename):
-	dictionary_list = []
+	result_list = []
 	try:
-		with open(filename) as f:
-			slice_lines = f.read().split(';\n')
-			slice_lines.pop()
-			
+		with open(filename) as f: 
+			slice_lines = f.readlines()
+			for i in range(len(slice_lines)):
+				slice_lines[i] = slice_lines[i].replace('\n', '')
+
+			parsed_lines = []
+			temp_line = ""
 			for line in slice_lines:
-				instruction = line.split('=', 1)
-				variable_list = [instruction[0],instruction[1].replace(';\n', '') , False]
-				dictionary_list.append(variable_list)
+				if line[-1] != ';':
+					temp_line += line
+				elif temp_line != "":
+					parsed_lines.append(temp_line)
+					temp_line = ""
+				else:
+					parsed_lines.append(line)
+
+			if temp_line != "":
+				parsed_lines.append(temp_line)
+
+			for line in parsed_lines:
+				if line[0] == '$':
+					instruction = line.split('=', 1)
+					if instruction[1][-1] == ';':
+						variable_list = [instruction[0],instruction[1].replace(';', '') , False]
+					else:
+						variable_list = [instruction[0],instruction[1], False]
+					result_list.append(variable_list)
+				else:
+					result_list.append(["", line, ""])
 
 		f.close()
 
@@ -19,7 +40,7 @@ def importFile(filename):
 		print ("Error opening file")
 		sys.exit(1)
 
-	return dictionary_list
+	return result_list
 
 def importPatterns(filename):
 	try:
@@ -66,6 +87,7 @@ if __name__ == "__main__":
 	patterns = importPatterns("proj-patterns/patterns")
 
 	parsed_instruction = substituteVariables(variable_list)
+	print(parsed_instruction)
 
 	content = []
 	flag = False
@@ -86,7 +108,6 @@ if __name__ == "__main__":
 					flag = True
 					break
 
-		print(content)
 		if(flag != True):
 			entry_points = pattern[1].split(',')
 			for entry_point in entry_points:
@@ -95,4 +116,4 @@ if __name__ == "__main__":
 						print("Inseguro")
 						sys.exit(1)
 
-	print("Seguro")
+	print("Seguro") 
