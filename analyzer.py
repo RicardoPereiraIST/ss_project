@@ -116,44 +116,36 @@ def createGraph(slice_list):
 
 	return graph
 
-def correctGraph(graph):
-	graph.add_node(-1)
-	for node in graph:
-		if graph.predecessors(node) == [] and node != -1:
-			graph.add_edge(-1, node)
-
-
 def traverseGraph(graph,pattern,sensitive_sink):
 	result = []
 
 	for node in sorted(graph):
 		successors = graph.successors(node)
 
-		if node != -1:
-			entry_points = pattern[1].split(',')
-			sanitization_functions = pattern[2].split(',')
+		entry_points = pattern[1].split(',')
+		sanitization_functions = pattern[2].split(',')
 
-			if successors == []:
-				last_node = node
-				sink_args = graph.nodes(data=True)[node][1]['body'].split(sensitive_sink)[1:][0].replace(' ', '')
-				for entry in entry_points:
-					if entry in sink_args:
-						graph.node[node]['tainted'] = True
-				for function in sanitization_functions:
-					if function in sink_args:
-						graph.node[node]['tainted'] = False
-			else:
-				body = graph.nodes(data=True)[node][1]['body']
-				for entry in entry_points:
-					if entry in body:
-						graph.node[node]['tainted'] = True
-				for function in sanitization_functions:
-					if function in body:
-						graph.node[node]['tainted'] = False
+		if successors == []:
+			last_node = node
+			sink_args = graph.nodes(data=True)[node][1]['body'].split(sensitive_sink)[1:][0].replace(' ', '')
+			for entry in entry_points:
+				if entry in sink_args:
+					graph.node[node]['tainted'] = True
+			for function in sanitization_functions:
+				if function in sink_args:
+					graph.node[node]['tainted'] = False
+		else:
+			body = graph.nodes(data=True)[node][1]['body']
+			for entry in entry_points:
+				if entry in body:
+					graph.node[node]['tainted'] = True
+			for function in sanitization_functions:
+				if function in body:
+					graph.node[node]['tainted'] = False
 
-			for successor in successors:
-				if graph.nodes(data=True)[node][1]['tainted'] == True:
-					graph.node[successor]['tainted'] = True
+		for successor in successors:
+			if graph.nodes(data=True)[node][1]['tainted'] == True:
+				graph.node[successor]['tainted'] = True
 
 
 	result.append(graph.nodes(data=True)[last_node][1]['tainted'])
@@ -173,7 +165,6 @@ if __name__ == "__main__":
 	found_pattern, sensitive_sink = findPattern(slice_list, patterns)
 
 	g = createGraph(slice_list)
-	correctGraph(g)
 
 	result = traverseGraph(g, found_pattern, sensitive_sink)
 
