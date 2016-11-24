@@ -1,0 +1,4 @@
+$nis=$_POST['nis'];
+$banana = $_GET['banana'];
+$query="SELECT *FROM siswa WHERE nis=$nis AND banana=mysql_escape_string($banana)";
+$q=mysql_query($query,$koneksi);

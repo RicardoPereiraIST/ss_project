@@ -141,7 +141,10 @@ def traverseGraph(graph,pattern,sensitive_sink):
 					graph.node[node]['tainted'] = True
 			for function in sanitization_functions:
 				if function in body:
-					graph.node[node]['tainted'] = False
+					all_vars = re.findall(r'\$\w*', body)
+					sanitized_vars = re.findall(function + r'\(\$\w*\)', body)
+					if len(all_vars) == len(sanitized_vars):
+						graph.node[node]['tainted'] = False
 
 		for successor in successors:
 			if graph.nodes(data=True)[node][1]['tainted'] == True:
