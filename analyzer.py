@@ -118,6 +118,7 @@ def createGraph(slice_list):
 
 def traverseGraph(graph,pattern,sensitive_sink):
 	result = []
+	sanitization_lines = ["Lines where input is sanitized"]
 
 	for node in sorted(graph):
 		successors = graph.successors(node)
@@ -134,6 +135,7 @@ def traverseGraph(graph,pattern,sensitive_sink):
 			for function in sanitization_functions:
 				if function in sink_args:
 					graph.node[node]['tainted'] = False
+					sanitization_lines.append(node+1)
 		else:
 			body = graph.nodes(data=True)[node][1]['body']
 			for entry in entry_points:
@@ -145,6 +147,7 @@ def traverseGraph(graph,pattern,sensitive_sink):
 					sanitized_vars = re.findall(function + r'\(\$\w*\)', body)
 					if len(all_vars) == len(sanitized_vars):
 						graph.node[node]['tainted'] = False
+						sanitization_lines.append(node+1)
 
 		for successor in successors:
 			if graph.nodes(data=True)[node][1]['tainted'] == True:
@@ -156,6 +159,7 @@ def traverseGraph(graph,pattern,sensitive_sink):
 		result.append(pattern[0])
 	else:
 		result.append("Seguro")
+		result.append(sanitization_lines)
 	return result
 
 
