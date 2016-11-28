@@ -1,1 +1,1 @@
-[False, 'Seguro']
+[False, 'Seguro', ['Lines where input is sanitized', 2]]
