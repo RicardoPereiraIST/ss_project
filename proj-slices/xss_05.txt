@@ -1,1 +1,1 @@
-echo urlencode  $_POST['username'];
+echo urlencode $_POST['username'];

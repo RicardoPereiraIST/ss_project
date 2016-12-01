@@ -31,12 +31,12 @@ def importFile(filename):
 				if line[0] == '$':
 					instruction = line.split('=', 1)
 					if instruction[1][-1] == ';':
-						variable_list = [instruction[0],instruction[1].replace(';', ''), False]
+						variable_list = [instruction[0],instruction[1].replace(';', '')]
 					else:
-						variable_list = [instruction[0],instruction[1], False]
+						variable_list = [instruction[0],instruction[1]]
 					result_list.append(variable_list)
 				else:
-					result_list.append(["", line, ""])
+					result_list.append(["", line])
 
 		f.close()
 
@@ -158,7 +158,7 @@ def traverseGraph(graph,pattern,sensitive_sink):
 	if result[0] == True:
 		result.append(pattern[0])
 	else:
-		result.append("Seguro")
+		result.append("Safe")
 		result.append(sanitization_lines)
 	return result
 
