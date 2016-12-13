@@ -1,0 +1,4 @@
+$course=$_GET['id'];
+$batchlist=$batchObj->selectbatch($course);
+$sql =  "SELECT * FROM batch WHERE course_id='$course' AND org_id='$org_id' ";
+$result =  $this->database->query($sql);

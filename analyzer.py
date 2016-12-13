@@ -128,7 +128,11 @@ def traverseGraph(graph,pattern,sensitive_sink):
 
 		if successors == []:
 			last_node = node
-			sink_args = graph.nodes(data=True)[node][1]['body'].split(sensitive_sink)[1:][0].replace(' ', '')
+			if "xss" in sys.argv[1]:
+				sink_args = graph.nodes(data=True)[node][1]['body'].split(sensitive_sink)[1:][0].replace(' ', '')
+			else:
+				sink_args = re.findall(r'\(.*\)', graph.nodes(data=True)[node][1]['body'])
+				sink_args = sink_args[0]
 			for entry in entry_points:
 				if entry in sink_args:
 					graph.node[node]['tainted'] = True
@@ -144,7 +148,7 @@ def traverseGraph(graph,pattern,sensitive_sink):
 			for function in sanitization_functions:
 				if function in body:
 					all_vars = re.findall(r'\$\w*', body)
-					sanitized_vars = re.findall(function + r'\(\$\w*\)', body)
+					sanitized_vars = re.findall(function + r'\(\$.*\)', body)
 					if len(all_vars) == len(sanitized_vars):
 						graph.node[node]['tainted'] = False
 						sanitization_lines.append(node+1)
